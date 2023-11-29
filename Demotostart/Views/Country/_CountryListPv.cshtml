@@ -1,0 +1,28 @@
+﻿@model List<CountryViewModel>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<table class="table table-bordered">
+    <tr>
+        <td>Id</td>
+        <th>Name</th>
+        
+        <th>Action</th>
+    </tr>
+    @if(Model !=null && Model.Count>0)
+    { 
+        @foreach(var item in Model)
+        {
+            <tr>
+                <td>@item.id</td>
+                <td>@item.CName</td>
+                
+                <td>
+                    <button class="updateBtn" data-id="@item.id">Update</button>
+                    <button class="deleteBtn" data-id="@item.id">Delete</button>
+                </td>
+            </tr>
+        }   
+     } 
+</table>

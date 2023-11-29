@@ -1,0 +1,130 @@
+﻿@model List<CountryViewModel>
+
+<div id="itemlist">
+    <partial name="_CountryListPv" model="@Model" />
+</div>
+
+<div class="row my-2">
+    <div class="col-md-4">
+
+        <div class="form-group">
+            <label for="CName" class="control-label">Name</label>
+            <input id="txtname" class="form-control" type="text"/>
+ 
+        </div>
+        
+        <div class="form-group">
+            <input type="button" id="addBtn" value="Add New Country" class="btn btn-primary my-3"/>
+        </div>
+    </div>
+</div>
+@section Scripts{
+      <script>
+       
+ 
+        // Update action using text input
+        $(document).on("click", ".updateBtn", function () {
+            var id = $(this).data("id");
+            var countryName = $(this).closest("tr").find("td:eq(1)").text();
+           
+            $("#txtname").val(countryName);
+           
+
+            // Change the Add button to behave as an Update button
+            $("#addBtn").attr("value", "Update Country");
+            $("#addBtn").data("action", "update");
+            $("#addBtn").data("id", id);
+        });
+
+        // Click event for the Add/Update button
+        $("#addBtn").click(function () {
+            var action = $(this).data("action");
+
+            if (action === "update") {
+                var id = $(this).data("id");
+                var newName = $("#txtname").val(); // Get the new name from the text input
+                
+                if (newName !== "") {
+                    updateCountry(id, newName);
+                } else {
+                    alert("Please enter a new value");
+                }
+
+                // Reset the Add button to its original state after the update
+                $("#addBtn").attr("value", "Add New Country");
+                $("#addBtn").removeData("action");
+                $("#addBtn").removeData("id");
+            } else {
+                // Handle the add functionality here
+                var newName = $("#txtname").val(); // Get the new name from the text input for adding
+
+                if (newName !== "") {
+                    // Perform the add action using AJAX
+                    addCountry(newName);
+                } else {
+                    alert("Please enter a name to add a new country.");
+                }
+            }
+        });
+
+        // Separate function for adding a new country using AJAX
+        function addCountry(name) {
+            $.ajax({
+                url: "@Url.Action("Create", "Country")",
+                data: { CName: name},
+                type: "Post",
+                success: function (result) {
+                    $("#itemlist").html(result);
+                    $("#txtname").val(""); // Clear the text input after adding
+                    
+
+                },
+                error: function () {
+                    alert("Failed to add a new country.");
+                }
+            });
+        }
+
+        // Separate function for updating a country using AJAX
+        function updateCountry(id, newName) {
+            $.ajax({
+                url: "@Url.Action("Update", "Country")",
+                data: { id: id, CName: newName },
+                type: "Post",
+                success: function (result) {
+                    $("#itemlist").html(result);
+                    $("#txtname").val(""); // Clear the text input after updating
+                   
+                },
+                error: function () {
+                    alert("Failed to update the country.");
+                }
+            });
+        }
+
+        // Delete action using AJAX
+        $(document).on("click", ".deleteBtn", function () {
+            var id = $(this).data("id");
+            var confirmation = confirm("Are you sure you want to delete?");
+            if (confirmation) {
+                deleteCountry(id);
+            }
+        });
+
+        // Separate function for deleting a country using AJAX
+        function deleteCountry(id) {
+            $.ajax({
+                url: "@Url.Action("Delete", "Country")",
+                data: { id: id },
+                type: "Post",
+                success: function (result) {
+                    $("#itemlist").html(result);
+                },
+                error: function () {
+                    alert("Failed to delete the country.");
+                }
+            });
+        }
+    </script>
+
+}
